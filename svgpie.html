@@ -1,0 +1,17 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="css/svgpie.css"></link>
+<script src="js/svgpie.js" charset="utf-8"></script>
+<script>
+	window.onload=function() {
+		var data=[["Playstation 4", 900],["XBox One", 450],["WiiU", 600], ["Sega", 300], ["Nvidia", 300]];
+		var colors=["blue", "green", "yellow", "orange", "violet"];
+		var svgpie = new SvgPie("container", {data:data, colors:colors});
+	}
+</script>
+</head>
+<body>
+	<div id="container" style="height:500px;width:800px;top:100px;left:100px;position:relative;">
+	</div>
+</body>
+</html>
