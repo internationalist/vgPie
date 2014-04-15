@@ -1,10 +1,34 @@
+/**The MIT License (MIT)
+
+Copyright (c) <year> <copyright holders>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ * 
+ */
+
 function SvgPie(id, config) {
 	
 	//functions
 	this.toRadians = function(angle) {
 		  return angle * (Math.PI / 180);
 	}
-	
+		
 	this.createLegend=function(legendwidth, legendheight, labels, percents, colors, data) {
 		var legenddiv = document.createElement("div");
 		legenddiv.style.width=legendwidth;
@@ -29,6 +53,34 @@ function SvgPie(id, config) {
 		return legenddiv;
 	}
 	
+	this.createShadow=function(svg) {
+		var svgNS = svg.namespaceURI;
+		var defs = document.createElementNS(svgNS, "defs");
+		var filter = document.createElementNS(svgNS, "filter");
+		filter.setAttribute('id', 'f1');
+		filter.setAttribute('x', '0');
+		filter.setAttribute('y', '0');
+		filter.setAttribute('width', '200%');
+		filter.setAttribute('height', '200%');
+		var feOffset = document.createElementNS(svgNS, "feOffset");
+		feOffset.setAttribute('result', 'offOut');
+		feOffset.setAttribute('in', 'SourceAlpha');
+		feOffset.setAttribute('dx', '5');
+		feOffset.setAttribute('dy', '5');
+		filter.appendChild(feOffset);
+		var feGaussian = document.createElementNS(svgNS, "feGaussianBlur");
+		feGaussian.setAttribute('result', 'blurOut');
+		feGaussian.setAttribute('in', 'offOut');
+		feGaussian.setAttribute('stdDeviation', '5');
+		filter.appendChild(feGaussian);
+		var feBlend = document.createElementNS(svgNS, "feBlend");
+		feBlend.setAttribute('in', 'SourceGraphic');
+		feBlend.setAttribute('in2', 'blurOut');
+		feBlend.setAttribute('mode', 'normal');			
+		filter.appendChild(feBlend);
+		svg.appendChild(filter);
+	}
+	
 	this.createPie=function(width, height, svg, angles, center, colors) {
 		var radius = null;
 		if(width < height) {
@@ -45,6 +97,7 @@ function SvgPie(id, config) {
 		circle.setAttribute('cy', center[1]);
 		circle.setAttribute('r', radius);
 		circle.setAttribute('fill', colors[colors.length - 1]);
+		circle.setAttribute('filter', 'url(#f1)');
 		svg.appendChild(circle);
 		
 		var cumAngle = 360 - angles[angles.length - 1];
@@ -68,6 +121,7 @@ function SvgPie(id, config) {
 			var arc = document.createElementNS(svgNS, 'path');
 			arc.setAttribute('d', attrVal);
 			arc.setAttribute('fill', colors[i]);
+			arc.setAttribute('stroke', 'white');			
 			svg.appendChild(arc);
 			cumAngle -= angles[i];
 		}		
@@ -151,6 +205,7 @@ function SvgPie(id, config) {
 	hostDiv.appendChild(svg);
 	div.appendChild(legenddiv);
 	div.appendChild(hostDiv);
+	this.createShadow(svg);
 	this.createPie(width, height, svg, angles, center, colors);
 	
 }
